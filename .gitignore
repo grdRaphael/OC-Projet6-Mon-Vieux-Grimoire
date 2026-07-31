@@ -3,3 +3,9 @@ node_modules/
 images/*
 !images/.gitkeep
 .DS_Store
+
+# Fichiers personnels de préparation à la soutenance
+journal-technique.md
+script-soutenance.md
+.claude/
+CLAUDE.md

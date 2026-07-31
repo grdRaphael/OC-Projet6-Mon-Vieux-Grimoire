@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require ('express')
 const mongoose = require("mongoose")
+const path = require('path');
 
 const app = express()
 
@@ -22,6 +23,7 @@ app.get('/', (req, res) => {
     res.json({message: "API OK"});
 });
 
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 
 module.exports = app;
