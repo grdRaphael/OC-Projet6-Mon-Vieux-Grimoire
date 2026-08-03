@@ -1,8 +1,9 @@
-require('dotenv').config();
+import "dotenv/config";
+import express from "express";
+import mongoose from "mongoose";
+import path from "path";
 
-const express = require ('express')
-const mongoose = require("mongoose")
-const path = require('path');
+
 
 const app = express()
 
@@ -23,8 +24,9 @@ app.get('/', (req, res) => {
     res.json({message: "API OK"});
 });
 
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/images', express.static(path.join(import.meta.dirname, 'images')));
 
 
-module.exports = app;
+
+export default app; 
 
