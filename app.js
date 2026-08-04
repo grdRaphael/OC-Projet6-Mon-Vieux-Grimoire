@@ -1,8 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
-import path from "path";
-
+import path from "path"
+import userRoutes from './routes/user.js'
 
 
 const app = express()
@@ -23,6 +23,8 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
     res.json({message: "API OK"});
 });
+
+app.use('/api/auth', userRoutes)
 
 app.use('/images', express.static(path.join(import.meta.dirname, 'images')));
 
