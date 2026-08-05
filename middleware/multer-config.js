@@ -7,7 +7,9 @@ const MIME_TYPES = {
     "image/png": "png"
 }
 
-const storage = multer.diskStorage({
+const storage = multer.memoryStorage()
+
+/*multer.diskStorage({
     destination: (req, file, callback) => {
         callback(null, path.join(import.meta.dirname, "..", "images")) // résultat: backend/images
     },
@@ -16,7 +18,7 @@ const storage = multer.diskStorage({
         const extension = MIME_TYPES[file.mimetype]
         callback(null, name + Date.now() + '.' + extension)
     }
-})
+})*/
 
 export default multer({
   storage,
