@@ -1,5 +1,15 @@
 import express from "express"
-import { createBook, deleteBook, getAllBooks, getBestRatingBooks, getOneBook, modifyBook, rateBook } from "../controllers/book.js"
+
+import {
+    createBook,
+    deleteBook,
+    getAllBooks,
+    getBestRatingBooks,
+    getOneBook,
+    modifyBook,
+    rateBook
+} from "../controllers/book.js"
+
 import auth from "../middleware/auth.js"
 import multerConfig from "../middleware/multer-config.js"
 import optimizeImage from "../middleware/sharp-config.js"

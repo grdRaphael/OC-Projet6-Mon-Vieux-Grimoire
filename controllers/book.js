@@ -1,5 +1,5 @@
 import Book from "../models/Book.js";
-import fs from "fs" // module natif de Node.js pour gérer des fichier
+import fs from "fs" // module natif de Node.js pour gérer des fichiers
 import path from "node:path";
 
 export const createBook = async (req, res, next) => {
@@ -27,8 +27,41 @@ export const createBook = async (req, res, next) => {
     }
 };
 
-export const modifyBook = (req, res, next) => {
+export const modifyBook = async (req, res, next) => {
+    const bookObject = req.file ? {                      // est ce qu'une nouvelle image existe ? 
+        ...JSON.parse(req.body.book),                    // si oui :  afficher objet avec req.body parser
+        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}` // et on recontruit la chemin de la nouvelle image
+    } : { ...req.body }
 
+    delete bookObject.userId
+
+    try {
+        const book = await Book.findOne({ _id: req.params.id })
+
+        if (book === null) {
+            return res.status(404).json({ message: "Livre non trouvé" })
+        }
+
+        if (book.userId !== req.auth.userId) {
+            res.status(401).json({ message: 'Not authorized' })
+        } else {
+            try {
+                await Book.updateOne(
+                    { _id: req.params.id },
+                    { ...bookObject, _id: req.params.id }
+                )
+                if (req.file) {
+                    const filename = book.imageUrl.split("/images/")[1]
+                    await fs.promises.unlink(path.join(import.meta.dirname, "..", "images", filename))
+                }
+                res.status(200).json({ message: 'Livre modifié' })
+            } catch (error) {
+                res.status(401).json({ error })
+            }
+        }
+    } catch (error) {
+        res.status(500).json({ error })
+    }
 };
 
 export const rateBook = (req, res, next) => {
@@ -70,14 +103,14 @@ export const getBestRatingBooks = async (req, res, next) => {
 export const deleteBook = async (req, res, next) => {
     try {
         const book = await Book.findOne({ _id: req.params.id })
-        if(book === null){
-            return res.status(404).json({message : "Livre non trouvé"})
+        if (book === null) {
+            return res.status(404).json({ message: "Livre non trouvé" })
         }
         if (book.userId != req.auth.userId) {
             res.status(401).json({ message: "Not authorized" })
         } else {
             const filename = book.imageUrl.split("/images/")[1]
-            fs.unlink(path.join(import.meta.dirname, "..", "images", filename) , async () => {
+            fs.unlink(path.join(import.meta.dirname, "..", "images", filename), async () => {
                 try {
                     const book = await Book.deleteOne({ _id: req.params.id })
                     res.status(200).json({ message: "Livre supprimé" })
@@ -86,7 +119,7 @@ export const deleteBook = async (req, res, next) => {
                 }
             })
         }
-    } catch (error){
+    } catch (error) {
         res.status(500).json({ error })
     }
 }
