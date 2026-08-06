@@ -12,7 +12,6 @@ const auth = (req, res, next) => {
     } catch (error) {
         res.status(401).json({ error: error.message })
     }
-
 }
 
 export default auth
