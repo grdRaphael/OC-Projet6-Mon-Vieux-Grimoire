@@ -5,7 +5,6 @@ import path from "path"
 import userRoutes from './routes/user.js'
 import booksRoutes from './routes/books.js'
 
-
 const app = express()
 
 mongoose.connect(process.env.MONGO_URI)
@@ -21,17 +20,9 @@ app.use((req, res, next) => {
     next();
 });
 
-
-app.get('/', (req, res) => {
-    res.json({message: "API OK"});
-});
-
 app.use('/api/books', booksRoutes )
-
 app.use('/api/auth', userRoutes)
-
 app.use('/images', express.static(path.join(import.meta.dirname, 'images')));
-
 
 export default app; 
 
