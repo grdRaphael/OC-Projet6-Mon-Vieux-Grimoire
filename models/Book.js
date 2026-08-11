@@ -11,7 +11,12 @@ const bookSchema = new mongoose.Schema({
     ratings: [
         {
             userId: {type: String, required: true}, 
-            grade: {type: Number, required: true}, 
+            grade: {
+                type: Number, 
+                required: true,
+                min: [0, "La note doit être au minimum de 0"],
+                max: [5, "La note doit être au maximum de 5"]
+            },
         }
     ]
 })

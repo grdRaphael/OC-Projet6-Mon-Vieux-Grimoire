@@ -14,6 +14,8 @@ export const createBook = async (req, res, next) => {
         const bookObject = JSON.parse(req.body.book) // book est l'étiquette du formadata définit dans le front (common.js)
         delete bookObject.userId
         delete bookObject._id
+        delete bookObject.ratings
+        delete bookObject.averageRating
 
         const book = new Book({
             ...bookObject,
@@ -21,7 +23,7 @@ export const createBook = async (req, res, next) => {
             imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
         })
         await book.save()
-        res.status(201).json({ message: 'Livre enregistré !' })
+        res.status(201).json({ message: 'book saved' })
     } catch (error) {
         res.status(400).json({ error: error.message })
     }
@@ -39,11 +41,11 @@ export const modifyBook = async (req, res, next) => {
         const book = await Book.findOne({ _id: req.params.id })
 
         if (book === null) {
-            return res.status(404).json({ message: "Livre non trouvé" })
+            return res.status(404).json({ message: "book not found" })
         }
 
         if (book.userId !== req.auth.userId) {
-            res.status(401).json({ message: 'Not authorized' })
+            res.status(403).json({ message: 'unauthorized request' })
         } else {
             try {
                 await Book.updateOne(
@@ -54,9 +56,9 @@ export const modifyBook = async (req, res, next) => {
                     const filename = book.imageUrl.split("/images/")[1]
                     await fs.promises.unlink(path.join(import.meta.dirname, "..", "images", filename))
                 }
-                res.status(200).json({ message: 'Livre modifié' })
+                res.status(200).json({ message: 'book modified' })
             } catch (error) {
-                res.status(401).json({ error })
+                res.status(403).json({ message: "unauthorized request" })
             }
         }
     } catch (error) {
@@ -64,9 +66,53 @@ export const modifyBook = async (req, res, next) => {
     }
 };
 
-export const rateBook = (req, res, next) => {
+export const rateBook = async (req, res, next) => {
 
-};
+    try {
+        // Le front limite déjà la note à 1-5, mais l'API est joignable
+        // directement (Postman) : la validation doit être côté serveur.
+        // Placé avant le findOne pour ne pas interroger la base pour rien.
+        if (req.body.rating < 0 || req.body.rating > 5) {
+            return res.status(400).json({ error: "La note doit être entre 0 et 5" })
+        }
+
+        const book = await Book.findOne({ _id: req.params.id })
+        if (book === null) {
+            return res.status(404).json({ message: 'Livre non trouvé' })
+        }
+
+        const isAlreadyRated =
+            book.ratings.some(rating =>
+                rating.userId === req.auth.userId)
+        // some() vérifie si un élément du tableau satisfait une condition
+
+        const ratedBook =
+        {
+            userId: req.auth.userId,
+            grade: req.body.rating
+        }
+
+        if (!isAlreadyRated) {
+            book.ratings.push(ratedBook)
+
+            const totalRating = book.ratings.reduce((acc, grade) => {
+                return acc + grade.grade
+            }, 0)
+            const averageRating = totalRating / book.ratings.length
+            book.averageRating = averageRating
+            await book.save()
+
+            res.status(200).json(book)
+        } else {
+            res.status(404).json({ message: "book already rated" })
+            console.log('livre déja noté')
+        }
+    } catch (error) {
+        res.status(500).json({ error })
+        console.error(error)
+    }
+}
+
 
 export const getAllBooks = async (req, res, next) => {
     try {
@@ -104,16 +150,16 @@ export const deleteBook = async (req, res, next) => {
     try {
         const book = await Book.findOne({ _id: req.params.id })
         if (book === null) {
-            return res.status(404).json({ message: "Livre non trouvé" })
+            return res.status(404).json({ message: "book not find" })
         }
         if (book.userId != req.auth.userId) {
-            res.status(401).json({ message: "Not authorized" })
+            res.status(403).json({ message: "unauthorized request" })
         } else {
             const filename = book.imageUrl.split("/images/")[1]
             fs.unlink(path.join(import.meta.dirname, "..", "images", filename), async () => {
                 try {
                     const book = await Book.deleteOne({ _id: req.params.id })
-                    res.status(200).json({ message: "Livre supprimé" })
+                    res.status(200).json({ message: "book delete" })
                 } catch (error) {
                     res.status(401).json({ error })
                 }
