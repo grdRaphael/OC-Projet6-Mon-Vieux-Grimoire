@@ -4,6 +4,7 @@
     "moduleResolution": "nodenext",
     "target": "esnext"
   },
+  "typeAcquisition": { "enable": false },
   "include": ["**/*.js"],
   "exclude": ["node_modules"]
 }

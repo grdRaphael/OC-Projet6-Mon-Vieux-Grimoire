@@ -22,7 +22,7 @@ const storage = multer.memoryStorage()
 
 export default multer({
   storage,
-  limits: { fileSize: 4 * 1024 * 1024 },        // 4 Mo maximum
+  limits: { fileSize: 10 * 1024 * 1024 },        // 10 Mo maximum
   fileFilter: (req, file, callback) => {
     if (MIME_TYPES[file.mimetype]) {
       callback(null, true);                      // accepté
