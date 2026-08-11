@@ -2,8 +2,9 @@ import "dotenv/config";
 import express from "express";
 import mongoose from "mongoose";
 import path from "path"
-import userRoutes from './routes/user.js'
-import booksRoutes from './routes/books.js'
+import userRoutes from './routes/userRoutes.js'
+import booksRoutes from './routes/booksRoutes.js'
+import errorHandler from "./middleware/error.js";
 
 const app = express()
 
@@ -22,7 +23,8 @@ app.use((req, res, next) => {
 
 app.use('/api/books', booksRoutes )
 app.use('/api/auth', userRoutes)
-app.use('/images', express.static(path.join(import.meta.dirname, 'images')));
+app.use('/images', express.static(path.join(import.meta.dirname, 'images')))
+app.use(errorHandler)
 
 export default app; 
 
