@@ -102,7 +102,7 @@ export const rateBook = async (req, res, next) => {
 
             res.status(200).json(book)
         } else {
-            res.status(404).json({ message: "book already rated" })
+            res.status(400).json({ message: "book already rated" })
         }
     } catch (error) {
         res.status(500).json({ error })

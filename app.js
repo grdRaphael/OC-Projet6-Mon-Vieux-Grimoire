@@ -3,7 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 import path from "path"
 import userRoutes from './routes/userRoutes.js'
-import booksRoutes from './routes/booksRoutes.js'
+import bookRoutes from './routes/bookRoutes.js'
 import errorHandler from "./middleware/error.js";
 
 const app = express()
@@ -21,7 +21,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use('/api/books', booksRoutes )
+app.use('/api/books', bookRoutes )
 app.use('/api/auth', userRoutes)
 app.use('/images', express.static(path.join(import.meta.dirname, 'images')))
 app.use(errorHandler)

@@ -8,7 +8,7 @@ import {
     getOneBook,
     modifyBook,
     rateBook
-} from "../controllers/bookControllers.js"
+} from "../controllers/bookController.js"
 
 import auth from "../middleware/auth.js"
 import multerConfig from "../middleware/multer-config.js"

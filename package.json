@@ -1,7 +1,7 @@
 {
   "name": "mon-vieux-grimoire-backend",
   "version": "1.0.0",
-  "description": "",
+  "description": "API REST du site de notation de livres Mon Vieux Grimoire (OpenClassrooms P7)",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -9,8 +9,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["api", "express", "mongodb", "jwt", "openclassrooms"],
+  "author": "Raphaël Grondin",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^6.0.0",
