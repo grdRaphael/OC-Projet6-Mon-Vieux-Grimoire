@@ -1,11 +1,26 @@
 import sharp from "sharp"
 import path from "node:path"
 
+const ALLOWED_FORMATS = ["jpeg", "png"]
 
 const optimizeImage = async (req, res, next) => {
     if (!req.file) {                        // garde fou si PUT /api/books/:id => json pur sans image
         return next()
     }
+
+    // 1. Ce fichier est-il bien une image, et de quels format  ?
+    let format
+    try {
+        format = (await sharp(req.file.buffer).metadata()).format 
+        //metadata() est la méthode qui inspecte les octets
+    } catch {
+        return next(new Error("Type de fichier non supporté"))   // sharp n'y reconnaît aucune image
+    }
+    if (!ALLOWED_FORMATS.includes(format)) {
+        return next(new Error("Type de fichier non supporté"))
+    }
+
+    // 2. Conversion et écriture sur le disque.
     try {
         // le nom sans son extension d'origine
         const clearExtension = path.parse(req.file.originalname).name
