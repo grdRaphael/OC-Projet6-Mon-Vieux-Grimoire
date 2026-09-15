@@ -9,8 +9,8 @@ import errorHandler from "./middleware/error.js";
 const app = express()
 
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('Connexion à MongoDB réussie !'))
-    .catch((error) => console.log('Connexion à MongoDB échouée !', error.message));
+    .then(() => console.log('Connected to MongoDB'))
+    .catch((error) => console.log('MongoDB connection failed:', error.message));
 
 app.use(express.json());
 

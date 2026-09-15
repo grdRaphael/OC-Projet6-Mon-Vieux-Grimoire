@@ -67,7 +67,7 @@ export const modifyBook = async (req, res) => {
     // l'orphelin côté serveur, plutôt que de faire pointer le livre vers un fichier effacé.
     if (req.file) {
         await fs.promises.unlink(getImagePath(book.imageUrl))
-            .catch(error => console.error("Ancienne image non supprimée :", error))
+            .catch(error => console.error("Old image not deleted:", error))
     }
 
     res.status(200).json({ message: 'book modified' })
@@ -75,12 +75,12 @@ export const modifyBook = async (req, res) => {
 
 export const rateBook = async (req, res) => {
     if (req.body.rating < 0 || req.body.rating > 5) {
-        return res.status(400).json({ error: "La note doit être entre 0 et 5" })
+        return res.status(400).json({ error: "rating must be between 0 and 5" })
     }
 
     const book = await Book.findOne({ _id: req.params.id })
     if (book === null) {
-        return res.status(404).json({ message: 'Livre non trouvé' })
+        return res.status(404).json({ message: 'book not found' })
     }
 
     // some() vérifie si un élément du tableau satisfait une condition
@@ -109,7 +109,7 @@ export const getAllBooks = async (req, res) => {
 export const getOneBook = async (req, res) => {
     const book = await Book.findOne({ _id: req.params.id })
     if (book === null) {
-        return res.status(404).json({ message: 'Livre non trouvé' })
+        return res.status(404).json({ message: 'book not found' })
     }
     res.status(200).json(book)
 };
@@ -135,9 +135,9 @@ export const deleteBook = async (req, res) => {
     await fs.promises.unlink(getImagePath(book.imageUrl))
         .catch(error => {
             if (error.code !== "ENOENT") throw error   // déjà absent : on poursuit
-            console.error("Image déjà absente du disque :", book.imageUrl)
+            console.error("Image already missing from disk:", book.imageUrl)
         })
 
     await Book.deleteOne({ _id: req.params.id })
-    res.status(200).json({ message: "book delete" })
+    res.status(200).json({ message: "book deleted" })
 }

@@ -15,7 +15,7 @@ export const signup = async (req, res) => {
 
     user.password = await bcrypt.hash(user.password, 10)
     await user.save()
-    res.status(201).json({ message: 'Utilisateur créé' })
+    res.status(201).json({ message: 'user created' })
 }
 
 export const login = async (req, res) => {
@@ -24,12 +24,12 @@ export const login = async (req, res) => {
     // Utilisateur inconnu et mot de passe faux renvoient le MÊME message :
     // les distinguer permettrait de reconstituer la liste des comptes existants.
     if (user === null) {
-        return res.status(401).json({ message: "Paire identifiant/mot de passe incorrecte" })
+        return res.status(401).json({ message: "incorrect email/password pair" })
     }
 
     const valid = await bcrypt.compare(req.body.password, user.password)
     if (!valid) {
-        return res.status(401).json({ message: "Paire identifiant/mot de passe incorrecte" })
+        return res.status(401).json({ message: "incorrect email/password pair" })
     }
 
     res.status(200).json({

@@ -15,12 +15,12 @@ const errorHandler = (err, req, res, next) => {
 
     if (err instanceof multer.MulterError) {          // garde-fous de l'upload
         if (err.code === "LIMIT_FILE_SIZE") {
-            return res.status(400).json({ error: "Image trop volumineuse (10 Mo maximum)" })
+            return res.status(400).json({ error: "image too large (10 MB maximum)" })
         }
-        return res.status(400).json({ error: "Fichier invalide" })
+        return res.status(400).json({ error: "invalid file" })
     }
 
-    if (err.message === "Type de fichier non supporté") {   // levée par le fileFilter
+    if (err.message === "unsupported file type") {   // levée par le fileFilter
         return res.status(400).json({ error: err.message })
     }
 
@@ -29,16 +29,16 @@ const errorHandler = (err, req, res, next) => {
     }
 
     if (err.name === "CastError") {                   // un identifiant qui n'est pas un ObjectId
-        return res.status(400).json({ error: "Identifiant invalide" })
+        return res.status(400).json({ error: "invalid ID" })
     }
 
     if (err instanceof SyntaxError) {                 // JSON malformé (express.json ou JSON.parse)
-        return res.status(400).json({ error: "Données invalides" })
+        return res.status(400).json({ error: "invalid data" })
     }
 
     if (err.code === 11000) {                         // index unique violé : deux inscriptions
         return res.status(400).json({                // simultanées ont passé le validateur
-            error: "Cette adresse email est déjà utilisée"
+            error: "this email address is already in use"
         })
     }
 
@@ -46,7 +46,7 @@ const errorHandler = (err, req, res, next) => {
     // Un échec de connexion à Mongo porte l'adresse du cluster dans son message :
     // la trace complète reste côté serveur.
     console.error(err)
-    res.status(500).json({ error: "Une erreur est survenue" })
+    res.status(500).json({ error: "an error occurred" })
 }
 
 export default errorHandler

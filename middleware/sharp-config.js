@@ -14,10 +14,10 @@ const optimizeImage = async (req, res, next) => {
         format = (await sharp(req.file.buffer).metadata()).format 
         //metadata() est la méthode qui inspecte les octets
     } catch {
-        return next(new Error("Type de fichier non supporté"))   // sharp n'y reconnaît aucune image
+        return next(new Error("unsupported file type"))   // sharp n'y reconnaît aucune image
     }
     if (!ALLOWED_FORMATS.includes(format)) {
-        return next(new Error("Type de fichier non supporté"))  // sharp reconnait une image, mais ce n'est pas un format autorisé
+        return next(new Error("unsupported file type"))  // sharp reconnait une image, mais ce n'est pas un format autorisé
     }
 
     // 2. Conversion et écriture sur le disque.
@@ -32,13 +32,13 @@ const optimizeImage = async (req, res, next) => {
         await sharp(req.file.buffer)
             .resize({ width: 500, withoutEnlargement: true })
             .webp({ quality: 80 })
-            .toFile(destination)
+            .toFile(destination)                               // écris le résultat sur le disque, à cette adresse
 
         req.file.filename = name
         next()
     } catch (error) {
         console.error(error)
-        res.status(400).json({ error: "Image invalide ou illisible" })
+        res.status(400).json({ error: "invalid or unreadable image" })
     }
 
 }
