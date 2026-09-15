@@ -95,7 +95,7 @@ export const rateBook = async (req, res) => {
     })
 
     const totalRating = book.ratings.reduce((acc, rating) => acc + rating.grade, 0)
-    book.averageRating = totalRating / book.ratings.length
+    book.averageRating = Math.round((totalRating / book.ratings.length) * 10) / 10
 
     await book.save()
     res.status(200).json(book)
