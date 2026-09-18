@@ -47,7 +47,11 @@ export const modifyBook = async (req, res) => {
         imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     } : { ...req.body }
 
-    delete bookObject.userId                             // le corps ne décide pas du propriétaire
+    delete bookObject.userId                            // le corps ne décide pas du propriétaire
+    delete bookObject.userId                            // le corps ne décide pas du propriétaire
+    delete bookObject.ratings                           // ni des votes
+    delete bookObject.averageRating                     // ni de la moyenne
+
 
     const book = await Book.findOne({ _id: req.params.id })
     if (book === null) {
@@ -94,15 +98,15 @@ export const rateBook = async (req, res) => {
         grade: req.body.rating
     })
 
-    const totalRating = book.ratings.reduce((acc, rating) => acc + rating.grade, 0)
-    book.averageRating = Math.round((totalRating / book.ratings.length) * 10) / 10
+    const sumOfGrades = book.ratings.reduce((acc, rating) => acc + rating.grade, 0)
+    book.averageRating = Math.round((sumOfGrades / book.ratings.length) * 10) / 10
 
     await book.save()
     res.status(200).json(book)
 };
 
 export const getAllBooks = async (req, res) => {
-    const books = await Book.find()
+    const books = await Book.find().sort({ _id: -1 })
     res.status(200).json(books)
 };
 
@@ -129,9 +133,6 @@ export const deleteBook = async (req, res) => {
         return res.status(403).json({ message: "unauthorized request" })
     }
 
-    // Le fichier d'abord, le document ensuite : si la seconde opération échoue,
-    // il reste un livre sans image — visible et corrigeable — plutôt qu'un fichier
-    // que plus rien ne référence, donc que personne ne saurait devoir nettoyer.
     await fs.promises.unlink(getImagePath(book.imageUrl))
         .catch(error => {
             if (error.code !== "ENOENT") throw error   // déjà absent : on poursuit
