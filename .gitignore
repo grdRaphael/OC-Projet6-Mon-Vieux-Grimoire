@@ -7,6 +7,7 @@ images/*
 # Fichiers personnels de préparation à la soutenance
 journal-technique.md
 script-soutenance.md
+storyboard-soutenance.md
 .claude/
 CLAUDE.md
 scratch.mjs

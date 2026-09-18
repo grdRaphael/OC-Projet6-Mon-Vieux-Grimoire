@@ -1,17 +1,25 @@
 import sharp from "sharp"
 import path from "node:path"
 
-const ALLOWED_FORMATS = ["jpeg", "png", "webp", "heif", "gif", "tiff"]   
+const ALLOWED_FORMATS = ["jpeg", "png", "webp", "heif", "gif", "tiff"]
 
 const optimizeImage = async (req, res, next) => {
     if (!req.file) {                        // garde fou si PUT /api/books/:id => json pur sans image
         return next()
     }
 
+    // 0. Les données du livre sont-elles lisibles ? Sinon, inutile de traiter l'image.
+    try {
+        JSON.parse(req.body.book)
+    } catch (error) {
+        return next(error)         // SyntaxError → errorHandler → 400 « invalid data »
+    }
+
+
     // 1. Ce fichier est-il bien une image, et de quels format  ?
     let format
     try {
-        format = (await sharp(req.file.buffer).metadata()).format 
+        format = (await sharp(req.file.buffer).metadata()).format
         //metadata() est la méthode qui inspecte les octets
     } catch {
         return next(new Error("unsupported file type"))   // sharp n'y reconnaît aucune image
@@ -28,11 +36,16 @@ const optimizeImage = async (req, res, next) => {
         const name = `${clearName}_${Date.now()}.webp`
 
         const destination = path.join(import.meta.dirname, '..', 'images', name)
-
         await sharp(req.file.buffer)
-            .resize({ width: 500, withoutEnlargement: true })
+            .resize({
+                width: 926,
+                height: 1190,
+                fit: 'cover',              // recadre au format portrait de la maquette
+                position: 'attention',     // garde la zone la plus intéressante de la photo
+                withoutEnlargement: true,  // n'agrandit jamais une petite image
+            })
             .webp({ quality: 80 })
-            .toFile(destination)                               // écris le résultat sur le disque, à cette adresse
+            .toFile(destination)
 
         req.file.filename = name
         next()
